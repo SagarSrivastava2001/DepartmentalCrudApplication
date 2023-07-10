@@ -4,6 +4,7 @@ import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
 import com.example.DepartmentalCrudApplication.model.Product_Inventory;
+import com.example.DepartmentalCrudApplication.repository.CustomerRepository;
 import com.example.DepartmentalCrudApplication.repository.ProductRepository;
 import com.example.DepartmentalCrudApplication.service.CustomerService;
 import com.example.DepartmentalCrudApplication.service.ProductInventoryService;
@@ -14,6 +15,8 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -38,10 +41,10 @@ public class ProductController {
             @ApiResponse(code = 400, message = "Bad request")
     })
     @PostMapping("/addProduct")
-    public String addProduct(@RequestBody Product_Inventory product) {
+    public ResponseEntity<Object> addProduct(@RequestBody Product_Inventory product) {
         productInventoryService.addProduct(product);
         logger.info("Product added: ID={}, Name={}", product.getProductId(), product.getProductName());
-        return "The product details are added.";
+        return ResponseEntity.ok("The product details are added.");
     }
 
     @ApiOperation(value = "Get All Products")
@@ -50,8 +53,9 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("/allProducts")
-    public List<Product_Inventory> allProducts() {
-        return productInventoryService.allProducts();
+    public ResponseEntity<Object> allProducts() {
+        List<Product_Inventory> products = productInventoryService.allProducts();
+        return ResponseEntity.ok(products);
     }
 
     @ApiOperation(value = "Get Product by ID")
@@ -61,18 +65,16 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("/ProductById{id}")
-    public Optional<Product_Inventory> getProductById(Long id) {
-
+    public ResponseEntity<Object> getProductById(@PathVariable Long id) {
         try {
             Optional<Product_Inventory> product = productInventoryService.getProductById(id);
             if (!product.isPresent()) {
                 throw new ProductNotFoundException("Product ID : " + id);
             }
-            return product;
+            return ResponseEntity.ok(product);
         } catch (ProductNotFoundException e) {
             logger.error("Product not found: ID={}", id);
-            Product_Inventory temp = new Product_Inventory();
-            return Optional.of(temp);
+            return ResponseEntity.ok("Product Not found");
         }
     }
 
@@ -82,8 +84,9 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("/Discount")
-    public Map<String, String> discount() {
-        return productInventoryService.discount();
+    public ResponseEntity<Object> discount() {
+        Map<String, String> discountMap = productInventoryService.discount();
+        return ResponseEntity.ok(discountMap);
     }
 
     @ApiOperation(value = "Optimized Back Orders")
@@ -92,8 +95,9 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @GetMapping("BackOrders")
-    public HashMap<Long, LinkedList<Customer>> optimisedBackOrders() {
-        return customerService.optimisedBackOrders();
+    public ResponseEntity<Object> optimisedBackOrders() {
+        HashMap<Long, LinkedList<Customer>> result = customerService.optimisedBackOrders();
+        return ResponseEntity.ok(result);
     }
 
     @ApiOperation(value = "Update Product Details")
@@ -104,29 +108,22 @@ public class ProductController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @PatchMapping("Update Product Details{id}")
-    public String updateProductDetails(@PathVariable Long id, @RequestBody ProductInventoryUpdateDTO updateDTO) {
-
+    public ResponseEntity<Object> updateProductDetails(@PathVariable Long id, @RequestBody ProductInventoryUpdateDTO updateDTO) {
         try {
-            Optional<Product_Inventory> product = productRepository.findById(id);
+            Optional<Product_Inventory> product = productInventoryService.getProductById(id);
 
             if (product.isPresent()) {
-                Boolean isBackOrder = productInventoryService.updateProductDetails(id, product.get());
-
-                product.get().setExpiry(updateDTO.getExpiry());
-                product.get().setCount(updateDTO.getCount());
-                product.get().setAvailability(updateDTO.getAvailability());
-                productRepository.save(product.get());
-
+                Boolean isBackOrder = productInventoryService.updateProductDetails(id, updateDTO);
                 if (isBackOrder) {
-                    return "Customer who was in Backorder has received the product and have been removed from the backorder.";
+                    return ResponseEntity.ok("Customer who was in Backorder has received the product and has been removed from the backorder.");
                 }
-                return "Product details have been updated";
+                return ResponseEntity.ok("Product details have been updated");
             } else {
                 throw new ProductNotFoundException("Product ID : " + id);
             }
         } catch (ProductNotFoundException e) {
             logger.error("Product not found: ID={}", id);
-            return "Product Not Found Error";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product Not Found Error");
         }
     }
 }

@@ -1,6 +1,10 @@
 package com.example.DepartmentalCrudApplication.service;
 
+import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
+import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Product_Inventory;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +17,6 @@ public interface ProductInventoryService {
 
     Map<String,String> discount();
 
-    Boolean updateProductDetails(Long id, Product_Inventory product);
-
+    Boolean updateProductDetails(Long id, @RequestBody ProductInventoryUpdateDTO updateDTO) throws ProductNotFoundException;
 }
 

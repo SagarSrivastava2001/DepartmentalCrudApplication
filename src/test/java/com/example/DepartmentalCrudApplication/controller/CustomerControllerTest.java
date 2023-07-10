@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
@@ -72,10 +74,11 @@ class CustomerControllerTest {
         order.setOrderTimestamp(Timestamp.valueOf("2023-06-11 20:03:07.576"));
 
         customer.setOrderDetails(order);
-        String response = customerController.addCustomer(customer);
+        ResponseEntity<Object> responseEntity = customerController.addCustomer(customer);
 
         String expectedMessage = "The product is out of stock for now.\nWe'll notify you once the product is restocked";
-        Assertions.assertEquals(expectedMessage, response);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(expectedMessage, responseEntity.getBody());
         Assertions.assertTrue(logger.isWarnEnabled());
     }
 
@@ -94,10 +97,11 @@ class CustomerControllerTest {
         order.setOrderTimestamp(Timestamp.valueOf("2023-06-21 17:34:38.054000"));
 
         customer.setOrderDetails(order);
-        String response = customerController.addCustomer(customer);
+        ResponseEntity<Object> responseEntity = customerController.addCustomer(customer);
 
         String expectedMessage = "The product is out of stock for now.\nWe'll notify you once the product is restocked ";
-        Assertions.assertEquals(expectedMessage, response);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(expectedMessage, responseEntity.getBody());
         Assertions.assertTrue(logger.isWarnEnabled());
     }
 
@@ -129,22 +133,28 @@ class CustomerControllerTest {
         long productPrice = product.get().getPrice();
         long quantity = order.getQuantity();
 
-        Assertions.assertEquals(3800L, productPrice * quantity * 0.95);
+        long expectedDiscountedPrice = (long) (productPrice * quantity * 0.95);
+        ResponseEntity<Object> responseEntity1 = customerController.addCustomer(customer);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity1.getStatusCode());
+        Assertions.assertEquals(expectedDiscountedPrice, Long.parseLong(responseEntity1.getBody().toString()));
 
         // Assert - 2
 
         order.setQuantity(8L);
         quantity = order.getQuantity();
         customer.setOrderDetails(order);
-        String result = customerController.addCustomer(customer);
+        long expectedDiscountedPrice2 = (long) (productPrice * quantity * 0.80);
+        ResponseEntity<Object> responseEntity2 = customerController.addCustomer(customer);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity2.getStatusCode());
+        Assertions.assertEquals(expectedDiscountedPrice2, Long.parseLong(responseEntity2.getBody().toString()));
 
-        Assertions.assertEquals(6400L,productPrice * quantity * 0.80);
 
         order.setQuantity(1L);
         quantity = order.getQuantity();
         customer.setOrderDetails(order);
-        result = customerController.addCustomer(customer);
-
-        Assertions.assertTrue(result.contains(String.valueOf(productPrice * quantity)));
+        long expectedPrice = productPrice * quantity;
+        ResponseEntity<Object> responseEntity3 = customerController.addCustomer(customer);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity3.getStatusCode());
+        Assertions.assertTrue(responseEntity3.getBody().toString().contains(String.valueOf(expectedPrice)));
     }
 }

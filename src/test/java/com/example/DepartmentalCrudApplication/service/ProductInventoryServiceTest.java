@@ -1,5 +1,6 @@
 package com.example.DepartmentalCrudApplication.service;
 
+import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
 import com.example.DepartmentalCrudApplication.model.OrderDetails;
@@ -28,6 +29,9 @@ class ProductInventoryServiceTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductInventoryUpdateDTO productInventoryUpdateDTO;
 
     private Map<Long, LinkedList<Customer>> mp = new HashMap<>();
 
@@ -70,7 +74,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product3 = new Product_Inventory();
         product3.setProductId(3L);
         product3.setAvailability(true);
-        product3.setCount(12L);
+        product3.setCount(10L);
         product3.setExpiry("5th July, 2025");
         product3.setPrice(50000L);
         product3.setProductDesc("Hair Straightner");
@@ -95,7 +99,6 @@ class ProductInventoryServiceTest {
         product1.setProductDesc("Chocolate");
         product1.setProductName("Dairy Milk");
 
-
         // Product 2
         Product_Inventory product2 = new Product_Inventory();
         product2.setProductId(2L);
@@ -111,7 +114,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product3 = new Product_Inventory();
         product3.setProductId(3L);
         product3.setAvailability(true);
-        product3.setCount(12L);
+        product3.setCount(10L);
         product3.setExpiry("5th July, 2025");
         product3.setPrice(50000L);
         product3.setProductDesc("Hair Straightner");
@@ -121,7 +124,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product4 = new Product_Inventory();
         product4.setProductId(4L);
         product4.setAvailability(true);
-        product4.setCount(24L);
+        product4.setCount(310L);
         product4.setExpiry("21 Aug, 2028");
         product4.setPrice(1000L);
         product4.setProductDesc("Chocolate");
@@ -181,7 +184,8 @@ class ProductInventoryServiceTest {
     void noBackOrdersFalse() {
 
         Long productId = 1L;
-        Product_Inventory product = new Product_Inventory();
+
+        ProductInventoryUpdateDTO product = new ProductInventoryUpdateDTO();
         product.setAvailability(true);
         product.setCount(10L);
 
@@ -193,12 +197,8 @@ class ProductInventoryServiceTest {
     @Test
     void noCustomerFalse() {
         long id = 5L;
-        Product_Inventory product = new Product_Inventory();
+        ProductInventoryUpdateDTO product = new ProductInventoryUpdateDTO();
         product.setCount(10L);
-        product.setProductId(5L);
-        product.setPrice(1000L);
-        product.setProductName("Car");
-        product.setProductDesc("Remote Control");
 
         Customer customer1 = new Customer();
         customer1.setCustomerId(1L);
@@ -242,12 +242,8 @@ class ProductInventoryServiceTest {
 
         customerService.addCustomer(customer);
 
-        Product_Inventory product = new Product_Inventory();
-        product.setProductId(2L);
+        ProductInventoryUpdateDTO product = new ProductInventoryUpdateDTO();
         product.setExpiry("15 Jan, 2025");
-        product.setPrice(1000L);
-        product.setProductDesc("Toy");
-        product.setProductName("Car");
         product.setCount(30L);
         product.setAvailability(true);
 
@@ -272,8 +268,7 @@ class ProductInventoryServiceTest {
     void NoRecordInBackorders(){
         long id = 1;
 
-        Product_Inventory product = new Product_Inventory();
-        product.setProductId(id);
+        ProductInventoryUpdateDTO product = new ProductInventoryUpdateDTO();
         product.setAvailability(true);
         product.setCount(10l);
 

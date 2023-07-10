@@ -1,5 +1,6 @@
-package com.example.DepartmentalCrudApplication.service.IMPL;
+package com.example.DepartmentalCrudApplication.serviceIMPL;
 
+import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
 import com.example.DepartmentalCrudApplication.model.Product_Inventory;
@@ -10,12 +11,11 @@ import com.example.DepartmentalCrudApplication.service.ProductInventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Service
@@ -30,10 +30,6 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
     private CustomerService customerService;
 
     private static final Logger logger = LoggerFactory.getLogger(ProductInventoryServiceImpl.class);
-
-    public ProductInventoryServiceImpl(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 
     @Override
     public void addProduct(Product_Inventory product) {
@@ -73,17 +69,18 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
     }
 
     @Override
-    public Boolean updateProductDetails(Long id,Product_Inventory product) throws ProductNotFoundException{
-
+    public Boolean updateProductDetails(Long id,@RequestBody ProductInventoryUpdateDTO updateDTO) throws ProductNotFoundException{
         try{
+
             Optional<Product_Inventory> prevProduct = productRepository.findById(id);
 
             if(prevProduct.isPresent() == false){
                 throw new ProductNotFoundException("Product ID : " + id);
             }
 
-            prevProduct.get().setAvailability(product.getAvailability());
-            prevProduct.get().setCount(prevProduct.get().getCount() + product.getCount());
+            prevProduct.get().setAvailability(updateDTO.getAvailability());
+            prevProduct.get().setCount(prevProduct.get().getCount() + updateDTO.getCount());
+            prevProduct.get().setExpiry(updateDTO.getExpiry());
 
             productRepository.save(prevProduct.get());
             logger.info("Updated product details. Product ID: {}", id);
@@ -99,7 +96,7 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
                     return false;
                 }
                 else{
-                    long newQuantity = product.getCount();
+                    long newQuantity = prevProduct.get().getCount();
                     List<Customer> filteredCustomers = l.stream()
                             .filter(customer -> customer.getOrderDetails().getQuantity() <= newQuantity)
                             .collect(Collectors.toList());

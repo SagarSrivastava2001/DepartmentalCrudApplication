@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
@@ -47,7 +49,8 @@ class ProductControllerTest {
         product.setAvailability(true);
         product.setExpiry("30 Mar, 2028");
 
-        String actual = productController.addProduct(product);
+        ResponseEntity<Object> responseEntity = productController.addProduct(product);
+        String actual = responseEntity.getBody().toString();
         String expected = "The product details are added.";
         Assertions.assertEquals(expected, actual);
     }
@@ -90,13 +93,14 @@ class ProductControllerTest {
         Product_Inventory product4 = new Product_Inventory();
         product4.setProductId(4L);
         product4.setAvailability(true);
-        product4.setCount(24L);
+        product4.setCount(310L);
         product4.setExpiry("21 Aug, 2028");
         product4.setPrice(1000L);
         product4.setProductDesc("Chocolate");
         product4.setProductName("Ferrero Rocher");
 
-        List<Product_Inventory> actualProducts = productController.allProducts();
+        ResponseEntity<Object> responseEntity = productController.allProducts();
+        List<Product_Inventory> actualProducts = (List<Product_Inventory>) responseEntity.getBody();
         List<Product_Inventory> expectedProducts = Arrays.asList(product1, product2, product3, product4);
         Assertions.assertEquals(expectedProducts, actualProducts);
     }
@@ -112,7 +116,8 @@ class ProductControllerTest {
         product1.setProductDesc("Chocolate");
         product1.setProductName("Dairy Milk");
 
-        Optional<Product_Inventory> actualProduct = productController.getProductById(1L);
+        ResponseEntity<Object> responseEntity = productController.getProductById(1L);
+        Optional<Product_Inventory> actualProduct = (Optional<Product_Inventory>) responseEntity.getBody();
         Assertions.assertTrue(actualProduct.isPresent());
         Assertions.assertEquals(product1, actualProduct.get());
     }
@@ -120,26 +125,31 @@ class ProductControllerTest {
     @Test
     void getProductByIdException(){
         long id = 10L;
-        Optional<Product_Inventory> product = productController.getProductById(id);
-        Optional<Product_Inventory> expectedProduct = Optional.of(new Product_Inventory());
-
-        Assertions.assertEquals(expectedProduct, product);
+        ResponseEntity<Object> responseEntity = productController.getProductById(id);
+        String expected = "Product Not found";
+        String actual = (String) responseEntity.getBody();
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void discount() {
-        Map<String, String> discounts = productController.discount();
+        ResponseEntity<Object> responseEntity = productController.discount();
+        Map<String, String> discounts = (Map<String, String>) responseEntity.getBody();
         Assertions.assertNotNull(discounts);
         Assertions.assertEquals(4, discounts.size());
     }
 
     @Test
     void updateProductDetails() {
-        Optional<Product_Inventory> product = productController.getProductById(1L);
-        product.get().setCount(40L);
-
-        Product_Inventory updatedProduct = productRepository.save(product.get());
-        Assertions.assertEquals(updatedProduct.getCount(), product.get().getCount());
+        ResponseEntity<Object> responseEntity = productController.getProductById(1L);
+        Optional<Product_Inventory> product = (Optional<Product_Inventory>) responseEntity.getBody();
+        if (product.isPresent()) {
+            product.get().setCount(40L);
+            Product_Inventory updatedProduct = productRepository.save(product.get());
+            Assertions.assertEquals(updatedProduct.getCount(), product.get().getCount());
+        } else {
+            Assertions.fail("Product not found");
+        }
     }
 
     @Test
@@ -150,8 +160,9 @@ class ProductControllerTest {
         product.setCount(10L);
         product.setExpiry("30 Mar, 2028");
 
-        boolean result = Boolean.parseBoolean(productController.updateProductDetails(productId, product));
-        Assertions.assertFalse(result);
+        ResponseEntity<Object> response = productController.updateProductDetails(productId, product);
+        String message = response.getBody().toString();
+        Assertions.assertFalse(message.contains("Customer who was in Backorder has received the product"));
     }
 
     @Test
@@ -164,7 +175,7 @@ class ProductControllerTest {
 
         Customer customer1 = new Customer();
         customer1.setCustomerId(1L);
-        customer1.setContactNumber( 76689092343L);
+        customer1.setContactNumber(76689092343L);
         customer1.setCustomerAddress("Delhi");
         customer1.setCustomerName("Ankit Kumar");
 
@@ -180,27 +191,31 @@ class ProductControllerTest {
 
         mp.put(5L, lt);
 
-        boolean result = Boolean.parseBoolean(productController.updateProductDetails(id, product));
+        ResponseEntity<Object> response = productController.updateProductDetails(id, product);
 
-        Assertions.assertFalse(result);
+        Assertions.assertFalse(Boolean.parseBoolean(response.getBody().toString()));
     }
 
+
     @Test
-    void NoRecordInBackorders(){
-        long id = 1;
+    void NoRecordInBackorders() {
+        long id = 1L;
 
         ProductInventoryUpdateDTO product = new ProductInventoryUpdateDTO();
         product.setAvailability(true);
-        product.setCount(10l);
+        product.setCount(10L);
         product.setExpiry("14 October, 2026");
 
-        Boolean result = Boolean.valueOf(productController.updateProductDetails(id,product));
-        Assertions.assertFalse(result);
+        ResponseEntity<Object> response = productController.updateProductDetails(id, product);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertFalse(Boolean.parseBoolean(response.getBody().toString()));
     }
+
 
     @Test
     void checkBackorders(){
-        HashMap<Long, LinkedList<Customer>> actualBackorderList = productController.optimisedBackOrders();
+        ResponseEntity<Object> actualBackorderList = productController.optimisedBackOrders();
         LinkedList<Customer> customerList = new LinkedList<>();
         LinkedList<Customer> customerList2 = new LinkedList<>();
         LinkedList<Customer> customerList3 = new LinkedList<>();
