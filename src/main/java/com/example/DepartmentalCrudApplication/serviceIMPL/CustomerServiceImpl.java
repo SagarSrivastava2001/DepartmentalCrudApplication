@@ -1,9 +1,11 @@
 package com.example.DepartmentalCrudApplication.serviceIMPL;
 
+import com.example.DepartmentalCrudApplication.dao.BackorderDao;
 import com.example.DepartmentalCrudApplication.dto.CustomerDTO;
 import com.example.DepartmentalCrudApplication.exceptions.CustomerNotFoundException;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
+import com.example.DepartmentalCrudApplication.model.OrderDetails;
 import com.example.DepartmentalCrudApplication.model.Product_Inventory;
 import com.example.DepartmentalCrudApplication.repository.CustomerRepository;
 import com.example.DepartmentalCrudApplication.repository.ProductRepository;
@@ -11,8 +13,13 @@ import com.example.DepartmentalCrudApplication.service.CustomerService;
 import com.example.DepartmentalCrudApplication.service.ProductInventoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +40,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private ProductInventoryService productInventoryService;
 
+    @Autowired
+    private BackorderDao backorderDao;
+
     HashMap<Long, LinkedList<Customer>> backordersRecord = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Override
     public void addCustomer(Customer customer) throws ProductNotFoundException{
-
         Long orderProductId = customer.getOrderDetails().getProductId();
         Long quantity = customer.getOrderDetails().getQuantity();
 
@@ -60,6 +72,7 @@ public class CustomerServiceImpl implements CustomerService {
                     LinkedList<Customer> arr = backordersRecord.getOrDefault(orderProductId, new LinkedList<>());
                     arr.add(customer);
                     backordersRecord.put(orderProductId, arr);
+                    backorderDao.insertBackorder(customer);
                     logger.info("Added customer to backordersRecord. Customer ID: {}, Product ID: {}", customer.getCustomerId(), orderProductId);
                 } else {
                     product.get().setCount(productCount - quantity);
@@ -77,6 +90,44 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public HashMap<Long, LinkedList<Customer>> optimisedBackOrders() {
+        backordersRecord.clear();
+
+        String query = "SELECT * FROM backorders";
+        jdbcTemplate.query(query, (resultSet) -> {
+            while (resultSet.next()) {
+                // Extract the data from the current row
+                long productId = resultSet.getLong("product_id");
+                long contactNumber = resultSet.getLong("contact_number");
+                String customerAddress = resultSet.getString("customer_address");
+                long customerId = resultSet.getLong("customer_id");
+                String customerName = resultSet.getString("customer_name");
+                long orderId = resultSet.getLong("order_id");
+                Date orderTimestamp = resultSet.getDate("order_timestamp");
+                long quantity = resultSet.getLong("quantity");
+
+                // Create a new Customer object
+                Customer customer = new Customer();
+                customer.setCustomerId(customerId);
+                customer.setCustomerName(customerName);
+                customer.setCustomerAddress(customerAddress);
+                customer.setContactNumber(contactNumber);
+
+                OrderDetails order = new OrderDetails();
+                order.setOrderId(orderId);
+                order.setOrderTimestamp(orderTimestamp);
+                order.setQuantity(quantity);
+                order.setProductId(productId);
+
+                customer.setOrderDetails(order);
+
+                // Update the backordersRecord HashMap
+                LinkedList<Customer> customers = backordersRecord.getOrDefault(productId, new LinkedList<>());
+                customers.add(customer);
+                backordersRecord.put(productId, customers);
+            }
+            return null;
+        });
+
         return backordersRecord;
     }
 

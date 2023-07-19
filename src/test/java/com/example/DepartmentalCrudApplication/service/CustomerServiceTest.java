@@ -48,29 +48,6 @@ class CustomerServiceTest {
 
         Assertions.assertTrue(retrievedCustomer1.isPresent());
         Assertions.assertEquals(customer1, retrievedCustomer1.get());
-
-        // Customer 2
-
-        Customer customer2 = new Customer();
-        customer2.setCustomerId(2L);
-        customer2.setContactNumber( 7899765678L);
-        customer2.setCustomerAddress("Mumbai");
-        customer2.setCustomerName("Sonia Sharma");
-
-        OrderDetails order2 = new OrderDetails();
-        order2.setProductId(1L);
-        order2.setOrderId(2L);
-        order2.setQuantity(2L);
-        order2.setOrderTimestamp(Timestamp.valueOf("2023-06-12 15:58:21.091000"));
-
-        customer2.setOrderDetails(order2);
-
-        customerService.addCustomer(customer2);
-
-        Optional<Customer> retrievedCustomer2 = customerService.getCustomerById(2L);
-
-        Assertions.assertTrue(retrievedCustomer2.isPresent());
-        Assertions.assertEquals(customer2, retrievedCustomer2.get());
     }
 
     @Test

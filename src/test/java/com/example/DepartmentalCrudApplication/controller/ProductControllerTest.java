@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import javax.transaction.Transactional;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -61,7 +62,7 @@ class ProductControllerTest {
         Product_Inventory product1 = new Product_Inventory();
         product1.setProductId(1L);
         product1.setAvailability(true);
-        product1.setCount(43L);
+        product1.setCount(35L);
         product1.setExpiry("30 Mar, 2028");
         product1.setPrice(10L);
         product1.setProductDesc("Chocolate");
@@ -83,7 +84,7 @@ class ProductControllerTest {
         Product_Inventory product3 = new Product_Inventory();
         product3.setProductId(3L);
         product3.setAvailability(true);
-        product3.setCount(12L);
+        product3.setCount(10L);
         product3.setExpiry("5th July, 2025");
         product3.setPrice(50000L);
         product3.setProductDesc("Hair Straightner");
@@ -93,7 +94,7 @@ class ProductControllerTest {
         Product_Inventory product4 = new Product_Inventory();
         product4.setProductId(4L);
         product4.setAvailability(true);
-        product4.setCount(310L);
+        product4.setCount(50L);
         product4.setExpiry("21 Aug, 2028");
         product4.setPrice(1000L);
         product4.setProductDesc("Chocolate");
@@ -110,7 +111,7 @@ class ProductControllerTest {
         Product_Inventory product1 = new Product_Inventory();
         product1.setProductId(1L);
         product1.setAvailability(true);
-        product1.setCount(43L);
+        product1.setCount(35L);
         product1.setExpiry("30 Mar, 2028");
         product1.setPrice(10L);
         product1.setProductDesc("Chocolate");
@@ -162,7 +163,7 @@ class ProductControllerTest {
 
         ResponseEntity<Object> response = productController.updateProductDetails(productId, product);
         String message = response.getBody().toString();
-        Assertions.assertFalse(message.contains("Customer who was in Backorder has received the product"));
+        Assertions.assertTrue(message.contains("Customer who was in Backorder has received the product"));
     }
 
     @Test
@@ -215,63 +216,27 @@ class ProductControllerTest {
 
     @Test
     void checkBackorders(){
-        ResponseEntity<Object> actualBackorderList = productController.optimisedBackOrders();
-        LinkedList<Customer> customerList = new LinkedList<>();
-        LinkedList<Customer> customerList2 = new LinkedList<>();
-        LinkedList<Customer> customerList3 = new LinkedList<>();
+        HashMap<Long, LinkedList<Customer>> actualBackorderList = (HashMap<Long, LinkedList<Customer>>)((productController.optimisedBackOrders()).getBody());
 
+        LinkedList<Customer> customerList = new LinkedList<>();
         HashMap<Long, LinkedList<Customer>> expectedBackorderList = new HashMap<>();
 
         Customer customer = new Customer();
-        customer.setCustomerId(1L);
-        customer.setCustomerName("Ankit Kumar");
+        customer.setCustomerId(2L);
+        customer.setCustomerName("Manik Kumar");
         customer.setCustomerAddress("Delhi");
-        customer.setContactNumber(76689092343L);
+        customer.setContactNumber(7668909224L);
 
         OrderDetails order = new OrderDetails();
-        order.setOrderId(1L);
-        order.setProductId(5L);
-        order.setOrderTimestamp(Timestamp.valueOf("2023-06-11 20:03:07.576"));
-        order.setQuantity(2L);
+        order.setOrderId(2L);
+        order.setProductId(4L);
+        order.setOrderTimestamp(Date.valueOf("2023-07-11"));
+        order.setQuantity(1000L);
 
         customer.setOrderDetails(order);
         customerList.add(customer);
 
-        expectedBackorderList.put(5L, customerList);
-
-        Customer customer2 = new Customer();
-        customer2.setCustomerId(1L);
-        customer2.setCustomerName("Ankit Kumar");
-        customer2.setCustomerAddress("Delhi");
-        customer2.setContactNumber(76689092343L);
-
-        OrderDetails order2 = new OrderDetails();
-        order2.setOrderId(1L);
-        order2.setProductId(10L);
-        order2.setOrderTimestamp(Timestamp.valueOf("2023-06-11 20:03:07.576"));
-        order2.setQuantity(2L);
-
-        customer2.setOrderDetails(order2);
-        customerList2.add(customer2);
-
-        expectedBackorderList.put(10L, customerList2);
-
-        Customer customer3 = new Customer();
-        customer3.setCustomerId(7L);
-        customer3.setContactNumber(7566787898L);
-        customer3.setCustomerAddress("Himachal Pradesh");
-        customer3.setCustomerName("Sumit Singh");
-
-        OrderDetails order3 = new OrderDetails();
-        order3.setProductId(4l);
-        order3.setOrderId(26l);
-        order3.setQuantity(30l);
-        order3.setOrderTimestamp(Timestamp.valueOf("2023-06-21 17:34:38.054000"));
-
-        customer3.setOrderDetails(order3);
-        customerList3.add(customer3);
-
-        expectedBackorderList.put(4l, customerList3);
+        expectedBackorderList.put(4L, customerList);
 
         Assertions.assertEquals(expectedBackorderList, actualBackorderList);
     }

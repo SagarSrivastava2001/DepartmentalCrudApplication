@@ -1,5 +1,6 @@
 package com.example.DepartmentalCrudApplication.serviceIMPL;
 
+import com.example.DepartmentalCrudApplication.dao.BackorderDao;
 import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
@@ -28,6 +29,9 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private BackorderDao backorderDao;
 
     private static final Logger logger = LoggerFactory.getLogger(ProductInventoryServiceImpl.class);
 
@@ -90,35 +94,8 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
                 return false;
             }
             else{
-                LinkedList<Customer> l = backordersRecord.get(id);
-
-                if(l == null){
-                    return false;
-                }
-                else{
-                    long newQuantity = prevProduct.get().getCount();
-                    List<Customer> filteredCustomers = l.stream()
-                            .filter(customer -> customer.getOrderDetails().getQuantity() <= newQuantity)
-                            .collect(Collectors.toList());
-
-                    filteredCustomers.forEach(customer -> {
-                        customerService.addCustomer(customer);
-                        l.remove(customer);
-                        if(l.size() == 0){
-                            backordersRecord.remove(id);
-                        }
-                        else{
-                            backordersRecord.put(id, l);
-                        }
-                        prevProduct.get().setCount(newQuantity - customer.getOrderDetails().getQuantity());
-
-                        if (newQuantity - customer.getOrderDetails().getQuantity() == 0) {
-                            prevProduct.get().setAvailability(false);
-                        }
-                    });
-                }
+                backorderDao.retrieveBackorders(id);
             }
-            productRepository.save(prevProduct.get());
             return true;
         }
         catch (ProductNotFoundException e){

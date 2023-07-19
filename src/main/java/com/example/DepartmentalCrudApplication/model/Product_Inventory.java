@@ -2,6 +2,7 @@ package com.example.DepartmentalCrudApplication.model;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -27,7 +28,7 @@ public class Product_Inventory {
     @NotEmpty(message = "Expiry field can't be empty")
     private String expiry;
 
-    @Positive
+    @Min(value = 0, message = "must be greater than or equal to 0")
     @NotNull(message = "Product Count cannot be null")
     private Long count;
 

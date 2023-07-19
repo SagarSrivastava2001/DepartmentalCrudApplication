@@ -93,7 +93,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product1 = new Product_Inventory();
         product1.setProductId(1L);
         product1.setAvailability(true);
-        product1.setCount(43L);
+        product1.setCount(35L);
         product1.setExpiry("30 Mar, 2028");
         product1.setPrice(10L);
         product1.setProductDesc("Chocolate");
@@ -124,7 +124,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product4 = new Product_Inventory();
         product4.setProductId(4L);
         product4.setAvailability(true);
-        product4.setCount(310L);
+        product4.setCount(50L);
         product4.setExpiry("21 Aug, 2028");
         product4.setPrice(1000L);
         product4.setProductDesc("Chocolate");
@@ -140,7 +140,7 @@ class ProductInventoryServiceTest {
         Product_Inventory product1 = new Product_Inventory();
         product1.setProductId(1L);
         product1.setAvailability(true);
-        product1.setCount(43L);
+        product1.setCount(35L);
         product1.setExpiry("30 Mar, 2028");
         product1.setPrice(10L);
         product1.setProductDesc("Chocolate");
@@ -153,7 +153,7 @@ class ProductInventoryServiceTest {
 
     @Test
     void getProductByIdException(){
-        Long productId = 5L;
+        Long productId = 10L;
 
         Assertions.assertThrows(ProductNotFoundException.class, () -> {
             Optional<Product_Inventory> product = productInventoryService.getProductById(productId);
@@ -191,7 +191,7 @@ class ProductInventoryServiceTest {
 
         boolean result = productInventoryService.updateProductDetails(productId, product);
 
-        Assertions.assertFalse(result);
+        Assertions.assertTrue(result);
     }
 
     @Test
@@ -273,6 +273,6 @@ class ProductInventoryServiceTest {
         product.setCount(10l);
 
         Boolean result = productInventoryService.updateProductDetails(id,product);
-        Assertions.assertFalse(result);
+        Assertions.assertTrue(result);
     }
 }
