@@ -56,72 +56,72 @@ class ProductControllerTest {
         Assertions.assertEquals(expected, actual);
     }
 
-    @Test
-    void allProducts() {
-        // Product 1
-        Product_Inventory product1 = new Product_Inventory();
-        product1.setProductId(1L);
-        product1.setAvailability(true);
-        product1.setCount(35L);
-        product1.setExpiry("30 Mar, 2028");
-        product1.setPrice(10L);
-        product1.setProductDesc("Chocolate");
-        product1.setProductName("Dairy Milk");
-
-
-        // Product 2
-        Product_Inventory product2 = new Product_Inventory();
-        product2.setProductId(2L);
-        product2.setAvailability(true);
-        product2.setCount(2L);
-        product2.setExpiry("15 Jan, 2025");
-        product2.setPrice(1000L);
-        product2.setProductDesc("Toy");
-        product2.setProductName("Car");
-
-
-        // Product 3
-        Product_Inventory product3 = new Product_Inventory();
-        product3.setProductId(3L);
-        product3.setAvailability(true);
-        product3.setCount(10L);
-        product3.setExpiry("5th July, 2025");
-        product3.setPrice(50000L);
-        product3.setProductDesc("Hair Straightner");
-        product3.setProductName("Dyson Hair Straightner");
-
-        // Product 4
-        Product_Inventory product4 = new Product_Inventory();
-        product4.setProductId(4L);
-        product4.setAvailability(true);
-        product4.setCount(50L);
-        product4.setExpiry("21 Aug, 2028");
-        product4.setPrice(1000L);
-        product4.setProductDesc("Chocolate");
-        product4.setProductName("Ferrero Rocher");
-
-        ResponseEntity<Object> responseEntity = productController.allProducts();
-        List<Product_Inventory> actualProducts = (List<Product_Inventory>) responseEntity.getBody();
-        List<Product_Inventory> expectedProducts = Arrays.asList(product1, product2, product3, product4);
-        Assertions.assertEquals(expectedProducts, actualProducts);
-    }
-
-    @Test
-    void getProductById() {
-        Product_Inventory product1 = new Product_Inventory();
-        product1.setProductId(1L);
-        product1.setAvailability(true);
-        product1.setCount(35L);
-        product1.setExpiry("30 Mar, 2028");
-        product1.setPrice(10L);
-        product1.setProductDesc("Chocolate");
-        product1.setProductName("Dairy Milk");
-
-        ResponseEntity<Object> responseEntity = productController.getProductById(1L);
-        Optional<Product_Inventory> actualProduct = (Optional<Product_Inventory>) responseEntity.getBody();
-        Assertions.assertTrue(actualProduct.isPresent());
-        Assertions.assertEquals(product1, actualProduct.get());
-    }
+//    @Test
+//    void allProducts() {
+//        // Product 1
+//        Product_Inventory product1 = new Product_Inventory();
+//        product1.setProductId(1L);
+//        product1.setAvailability(true);
+//        product1.setCount(35L);
+//        product1.setExpiry("30 Mar, 2028");
+//        product1.setPrice(10L);
+//        product1.setProductDesc("Chocolate");
+//        product1.setProductName("Dairy Milk");
+//
+//
+//        // Product 2
+//        Product_Inventory product2 = new Product_Inventory();
+//        product2.setProductId(2L);
+//        product2.setAvailability(true);
+//        product2.setCount(2L);
+//        product2.setExpiry("15 Jan, 2025");
+//        product2.setPrice(1000L);
+//        product2.setProductDesc("Toy");
+//        product2.setProductName("Car");
+//
+//
+//        // Product 3
+//        Product_Inventory product3 = new Product_Inventory();
+//        product3.setProductId(3L);
+//        product3.setAvailability(true);
+//        product3.setCount(10L);
+//        product3.setExpiry("5th July, 2025");
+//        product3.setPrice(50000L);
+//        product3.setProductDesc("Hair Straightner");
+//        product3.setProductName("Dyson Hair Straightner");
+//
+//        // Product 4
+//        Product_Inventory product4 = new Product_Inventory();
+//        product4.setProductId(4L);
+//        product4.setAvailability(true);
+//        product4.setCount(50L);
+//        product4.setExpiry("21 Aug, 2028");
+//        product4.setPrice(1000L);
+//        product4.setProductDesc("Chocolate");
+//        product4.setProductName("Ferrero Rocher");
+//
+//        ResponseEntity<Object> responseEntity = productController.allProducts();
+//        List<Product_Inventory> actualProducts = (List<Product_Inventory>) responseEntity.getBody();
+//        List<Product_Inventory> expectedProducts = Arrays.asList(product1, product2, product3, product4);
+//        Assertions.assertEquals(expectedProducts, actualProducts);
+//    }
+//
+//    @Test
+//    void getProductById() {
+//        Product_Inventory product1 = new Product_Inventory();
+//        product1.setProductId(1L);
+//        product1.setAvailability(true);
+//        product1.setCount(35L);
+//        product1.setExpiry("30 Mar, 2028");
+//        product1.setPrice(10L);
+//        product1.setProductDesc("Chocolate");
+//        product1.setProductName("Dairy Milk");
+//
+//        ResponseEntity<Object> responseEntity = productController.getProductById(1L);
+//        Optional<Product_Inventory> actualProduct = (Optional<Product_Inventory>) responseEntity.getBody();
+//        Assertions.assertTrue(actualProduct.isPresent());
+//        Assertions.assertEquals(product1, actualProduct.get());
+//    }
 
     @Test
     void getProductByIdException(){

@@ -1,6 +1,12 @@
 package com.example.DepartmentalCrudApplication;
+import com.example.DepartmentalCrudApplication.service.EmailSenderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.web.client.RestTemplate;
 
 /*
 	Flow of CRUD Application - Model Class -> Repository Interface -> Service Layer -> REST Controller

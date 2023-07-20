@@ -21,6 +21,9 @@ public class Customer {
     @NotNull(message = "Contact Number field can't be empty")
     private Long contactNumber;
 
+    @Email(message = "Enter the correct email...")
+    private String customerEmail;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
     private OrderDetails orderDetails;

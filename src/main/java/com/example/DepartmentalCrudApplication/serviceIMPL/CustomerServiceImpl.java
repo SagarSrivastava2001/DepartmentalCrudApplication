@@ -10,10 +10,13 @@ import com.example.DepartmentalCrudApplication.model.Product_Inventory;
 import com.example.DepartmentalCrudApplication.repository.CustomerRepository;
 import com.example.DepartmentalCrudApplication.repository.ProductRepository;
 import com.example.DepartmentalCrudApplication.service.CustomerService;
+import com.example.DepartmentalCrudApplication.service.EmailSenderService;
 import com.example.DepartmentalCrudApplication.service.ProductInventoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
@@ -49,6 +52,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+	private EmailSenderService emailSenderService;
 
     @Override
     public void addCustomer(Customer customer) throws ProductNotFoundException{
@@ -174,12 +180,18 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         if (isDiscount == false) {
+            String body = "Hi " + customer.getCustomerName() + " \nHere is your bill for the purchase:\n\nThe price is " + product.get().getPrice() * customer.getOrderDetails().getQuantity();
+            String subject = "Customer Bill for Purchase";
+            emailSenderService.sendSimpleEmail(customer.getCustomerEmail(), body, subject);
             logger.info("Customer details added for customer ID: {}. Price: {}", customer.getCustomerId(), price);
-            return "The customer details are added.\n\nThe price is " + (product.get().getPrice() * customer.getOrderDetails().getQuantity()) + ". Please Pay.";
+            return "Bill details have been sent to the customer mail...";
         }
         else{
+            String body = "Hi " + customer.getCustomerName() + " \nHere is your bill for the purchase:\n\nThe price is " + product.get().getPrice() * customer.getOrderDetails().getQuantity() + "\n\nDiscounted Price is " + newPrice;
+            String subject = "Customer Bill for Purchase";
+            emailSenderService.sendSimpleEmail(customer.getCustomerEmail(), body, subject);
             logger.info("Customer details added for customer ID: {}. Price: {}. Discounted Price: {}", customer.getCustomerId(), price, newPrice);
-            return "The customer details are added.\n\nThe price is " + (product.get().getPrice() * customer.getOrderDetails().getQuantity()) + ".\n\nDiscounted Price is " + newPrice + ".\n\nPlease Pay. " + ((product.get().getPrice() * customer.getOrderDetails().getQuantity()) - newPrice);
+            return "Bill details have been sent to the customer mail...";
         }
     }
 
