@@ -11,20 +11,14 @@ import com.example.DepartmentalCrudApplication.model.Product_Inventory;
 import com.example.DepartmentalCrudApplication.repository.CustomerRepository;
 import com.example.DepartmentalCrudApplication.repository.ProductRepository;
 import com.example.DepartmentalCrudApplication.service.CustomerService;
-//import com.example.DepartmentalCrudApplication.service.EmailSenderService;
 import com.example.DepartmentalCrudApplication.service.ProductInventoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import java.sql.*;
 import java.util.*;
 import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -55,9 +49,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    //@Autowired
-	//private EmailSenderService emailSenderService;
 
     @Override
     public void addCustomer(Customer customer) throws ProductNotFoundException{
