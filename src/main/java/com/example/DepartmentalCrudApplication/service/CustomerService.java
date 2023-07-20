@@ -12,4 +12,6 @@ public interface CustomerService {
     String discountMethod(Optional<Product_Inventory> product, Customer customer);
 
     List<CustomerDTO> findByCustomerName(String customerName);
+
+    String sendEmail(String toEmail, String body, String subject);
 }
