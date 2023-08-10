@@ -151,7 +151,7 @@ class CustomerControllerTest {
 
         ResponseEntity<Object> responseEntity2 = customerController.addCustomer(customer);
         String actualResponse2 = (String) responseEntity2.getBody();
-        String expectedResponse2 = "Failed to add customer details.";
+        String expectedResponse2 = "The product is out of stock for now.\nWe'll notify you once the product is restocked";
         Assertions.assertEquals(expectedResponse2, actualResponse2);
 
 

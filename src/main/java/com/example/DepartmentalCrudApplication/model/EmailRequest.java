@@ -1,5 +1,8 @@
 package com.example.DepartmentalCrudApplication.model;
 
+import lombok.Data;
+
+@Data
 public class EmailRequest {
     private String toEmail;
     private String body;

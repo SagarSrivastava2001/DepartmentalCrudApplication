@@ -174,8 +174,9 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         if (isDiscount == false) {
-            String body = "Hi " + customer.getCustomerName() + " \nHere is your bill for the purchase:\n\nThe price is " + product.get().getPrice() * customer.getOrderDetails().getQuantity();
-            String subject = "Customer Bill for Purchase";
+            Date date = new Date(customer.getOrderDetails().getOrderTimestamp().getTime());
+            String body = "Thank you " + customer.getCustomerName() + "\nYou've made a purchase from our store.\n\nOrder number: " + customer.getOrderDetails().getOrderId() + "Order date: " + date + "Your account:\n" + customer.getCustomerEmail() + "\nPrice: " + product.get().getPrice() * customer.getOrderDetails().getQuantity();
+            String subject = "Your Product Purchase Order Receipt from " + date;
 
             sendEmail(customer.getCustomerEmail(), body, subject);
 
@@ -183,8 +184,10 @@ public class CustomerServiceImpl implements CustomerService {
             return "Bill details have been sent to the customer mail...";
         }
         else{
-            String body = "Hi " + customer.getCustomerName() + " \nHere is your bill for the purchase:\n\nThe price is " + product.get().getPrice() * customer.getOrderDetails().getQuantity() + "\n\nDiscounted Price is " + newPrice;
-            String subject = "Customer Bill for Purchase";
+            Date date = new Date(customer.getOrderDetails().getOrderTimestamp().getTime());
+            String subject = "Your Product Purchase Order Receipt from " + date;
+
+            String body = "Thank you " + customer.getCustomerName() + "\nYou've made a purchase from our store.\n\nOrder number: " + customer.getOrderDetails().getOrderId() + "\nOrder date: " + date + "\nYour account:\n" + customer.getCustomerEmail() + "\nPrice: " + product.get().getPrice() * customer.getOrderDetails().getQuantity() + "\nDiscounted Price: " + newPrice + "\n\nNet Amount: " + (product.get().getPrice() * customer.getOrderDetails().getQuantity() - newPrice);
 
             sendEmail(customer.getCustomerEmail(), body, subject);
 

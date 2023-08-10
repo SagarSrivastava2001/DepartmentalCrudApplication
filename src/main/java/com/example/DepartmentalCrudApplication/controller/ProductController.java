@@ -4,7 +4,6 @@ import com.example.DepartmentalCrudApplication.dto.ProductInventoryUpdateDTO;
 import com.example.DepartmentalCrudApplication.exceptions.ProductNotFoundException;
 import com.example.DepartmentalCrudApplication.model.Customer;
 import com.example.DepartmentalCrudApplication.model.Product_Inventory;
-import com.example.DepartmentalCrudApplication.repository.CustomerRepository;
 import com.example.DepartmentalCrudApplication.repository.ProductRepository;
 import com.example.DepartmentalCrudApplication.service.CustomerService;
 import com.example.DepartmentalCrudApplication.service.ProductInventoryService;

@@ -42,9 +42,15 @@ public class CustomerController {
     public ResponseEntity<Object> addCustomer(@Valid @RequestBody Customer customer) {
         try {
             Optional<Product_Inventory> product = productInventoryService.getProductById(customer.getOrderDetails().getProductId());
-            customerService.addCustomer(customer);
             String response = customerService.discountMethod(product, customer);
-            return ResponseEntity.ok(response);
+
+            if(response != "Failed to add customer details."){
+                customerService.addCustomer(customer);
+                return ResponseEntity.ok(response);
+            }
+            else{
+                throw new Exception();
+            }
         } catch (Exception e) {
             logger.error("Failed to add customer details: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add customer details.");
