@@ -63,7 +63,7 @@ public class ProductController {
             @ApiResponse(code = 404, message = "Product not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @GetMapping("/ProductById{id}")
+    @GetMapping("/productById/{id}")
     public ResponseEntity<Object> getProductById(@PathVariable Long id) {
         try {
             Optional<Product_Inventory> product = productInventoryService.getProductById(id);
@@ -82,7 +82,7 @@ public class ProductController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @GetMapping("/Discount")
+    @GetMapping("/discount")
     public ResponseEntity<Object> discount() {
         Map<String, String> discountMap = productInventoryService.discount();
         return ResponseEntity.ok(discountMap);
@@ -93,7 +93,7 @@ public class ProductController {
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @GetMapping("BackOrders")
+    @GetMapping("backOrders")
     public ResponseEntity<Object> optimisedBackOrders() {
         HashMap<Long, LinkedList<Customer>> result = customerService.optimisedBackOrders();
         return ResponseEntity.ok(result);
@@ -106,7 +106,7 @@ public class ProductController {
             @ApiResponse(code = 404, message = "Product not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @PatchMapping("Update Product Details{id}")
+    @PatchMapping("/updateProductDetails/{id}")
     public ResponseEntity<Object> updateProductDetails(@PathVariable Long id, @RequestBody ProductInventoryUpdateDTO updateDTO) {
         try {
             Optional<Product_Inventory> product = productInventoryService.getProductById(id);

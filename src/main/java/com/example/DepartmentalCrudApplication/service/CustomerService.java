@@ -6,6 +6,8 @@ import com.example.DepartmentalCrudApplication.model.Product_Inventory;
 import java.util.*;
 
 public interface CustomerService {
+    void setEnabledMethod(boolean enabledMethod);
+
     void addCustomer(Customer customer);
     HashMap<Long, LinkedList<Customer>> optimisedBackOrders();
     Optional<Customer> getCustomerById(Long id);

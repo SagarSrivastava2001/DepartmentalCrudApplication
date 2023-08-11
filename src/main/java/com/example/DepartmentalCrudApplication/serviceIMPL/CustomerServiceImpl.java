@@ -43,6 +43,13 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private BackorderDao backorderDao;
 
+    private boolean enabledMethod = true;
+
+    @Override
+    public void setEnabledMethod(boolean enabledMethod){
+        this.enabledMethod = enabledMethod;
+    }
+
     HashMap<Long, LinkedList<Customer>> backordersRecord = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
@@ -173,7 +180,7 @@ public class CustomerServiceImpl implements CustomerService {
             isDiscount = true;
         }
 
-        if (isDiscount == false) {
+        if (isDiscount == false && enabledMethod == true) {
             Date date = new Date(customer.getOrderDetails().getOrderTimestamp().getTime());
             String body = "Thank you " + customer.getCustomerName() + "\nYou've made a purchase from our store.\n\nOrder number: " + customer.getOrderDetails().getOrderId() + "Order date: " + date + "Your account:\n" + customer.getCustomerEmail() + "\nPrice: " + product.get().getPrice() * customer.getOrderDetails().getQuantity();
             String subject = "Your Product Purchase Order Receipt from " + date;
@@ -184,15 +191,20 @@ public class CustomerServiceImpl implements CustomerService {
             return "Bill details have been sent to the customer mail...";
         }
         else{
-            Date date = new Date(customer.getOrderDetails().getOrderTimestamp().getTime());
-            String subject = "Your Product Purchase Order Receipt from " + date;
+            if(enabledMethod == true){
+                Date date = new Date(customer.getOrderDetails().getOrderTimestamp().getTime());
+                String subject = "Your Product Purchase Order Receipt from " + date;
 
-            String body = "Thank you " + customer.getCustomerName() + "\nYou've made a purchase from our store.\n\nOrder number: " + customer.getOrderDetails().getOrderId() + "\nOrder date: " + date + "\nYour account:\n" + customer.getCustomerEmail() + "\nPrice: " + product.get().getPrice() * customer.getOrderDetails().getQuantity() + "\nDiscounted Price: " + newPrice + "\n\nNet Amount: " + (product.get().getPrice() * customer.getOrderDetails().getQuantity() - newPrice);
+                String body = "Thank you " + customer.getCustomerName() + "\nYou've made a purchase from our store.\n\nOrder number: " + customer.getOrderDetails().getOrderId() + "\nOrder date: " + date + "\nYour account:\n" + customer.getCustomerEmail() + "\nPrice: " + product.get().getPrice() * customer.getOrderDetails().getQuantity() + "\nDiscounted Price: " + newPrice + "\n\nNet Amount: " + (product.get().getPrice() * customer.getOrderDetails().getQuantity() - newPrice);
 
-            sendEmail(customer.getCustomerEmail(), body, subject);
+                sendEmail(customer.getCustomerEmail(), body, subject);
 
-            logger.info("Customer details added for customer ID: {}. Price: {}. Discounted Price: {}", customer.getCustomerId(), price, newPrice);
-            return "Bill details have been sent to the customer mail...";
+                logger.info("Customer details added for customer ID: {}. Price: {}. Discounted Price: {}", customer.getCustomerId(), price, newPrice);
+                return "Bill details have been sent to the customer mail...";
+            }
+            else{
+                return "Not allowing email functioning while testing";
+            }
         }
     }
 

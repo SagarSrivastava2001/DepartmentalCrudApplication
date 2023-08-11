@@ -38,7 +38,7 @@ public class CustomerController {
             @ApiResponse(code = 404, message = "Product not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    @PostMapping("Customer Details")
+    @PostMapping("/addCustomer")
     public ResponseEntity<Object> addCustomer(@Valid @RequestBody Customer customer) {
         try {
             Optional<Product_Inventory> product = productInventoryService.getProductById(customer.getOrderDetails().getProductId());

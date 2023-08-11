@@ -46,18 +46,21 @@ class CustomerControllerTest {
     void addCustomer() {
         Customer customer = new Customer();
         customer.setCustomerId(1L);
-        customer.setContactNumber( 7668909234L);
+        customer.setContactNumber( 8665667550L);
         customer.setCustomerAddress("Delhi");
-        customer.setCustomerName("Ankit Kumar");
+        customer.setCustomerName("Sunil");
+        customer.setCustomerEmail("srivastavasagar2001@gmail.com");
 
         OrderDetails order = new OrderDetails();
         order.setProductId(1L);
         order.setOrderId(1L);
-        order.setQuantity(2L);
-        order.setOrderTimestamp(Timestamp.valueOf("2023-07-11 13:08:11.343000"));
+        order.setQuantity(3L);
+        order.setOrderTimestamp(Timestamp.valueOf("2023-08-09 11:00:28.557"));
 
         customer.setOrderDetails(order);
+        customerService.setEnabledMethod(false);
         customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
 
         Optional<Customer> retrievedCustomer = customerService.getCustomerById(1L);
         Assertions.assertEquals(customer,retrievedCustomer.get());
@@ -78,7 +81,9 @@ class CustomerControllerTest {
         order.setOrderTimestamp(Timestamp.valueOf("2023-06-11 20:03:07.576"));
 
         customer.setOrderDetails(order);
+        customerService.setEnabledMethod(false);
         ResponseEntity<Object> responseEntity = customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
 
         String expectedMessage = "The product is out of stock for now.\nWe'll notify you once the product is restocked";
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -101,9 +106,12 @@ class CustomerControllerTest {
         order.setOrderTimestamp(Timestamp.valueOf("2023-06-21 17:34:38.054000"));
 
         customer.setOrderDetails(order);
+        customerService.setEnabledMethod(false);
         ResponseEntity<Object> responseEntity = customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
 
-        String expectedMessage = "The product is out of stock for now.\nWe'll notify you once the product is restocked ";
+
+        String expectedMessage = "The product is out of stock for now.\nWe'll notify you once the product is restocked";
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Assertions.assertEquals(expectedMessage, responseEntity.getBody());
         Assertions.assertTrue(logger.isWarnEnabled());
@@ -124,20 +132,29 @@ class CustomerControllerTest {
         order.setOrderTimestamp(Timestamp.valueOf("2023-06-11 20:03:07.576"));
 
         customer.setOrderDetails(order);
+        customerService.setEnabledMethod(false);
         customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
 
-        Optional<Product_Inventory> product = productInventoryService.getProductById(4L);
+
+        Optional<Product_Inventory> product = productInventoryService.getProductById(1L);
 
         // Assert-1
 
         order.setQuantity(4L);
         customer.setOrderDetails(order);
+        customerService.setEnabledMethod(false);
         customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
+
 
         long productPrice = product.get().getPrice();
         long quantity = 4L;
 
+        customerService.setEnabledMethod(false);
         ResponseEntity<Object> responseEntity1 = customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
+
         String actualResponse = (String) responseEntity1.getBody();
         String expectedResponse = "The customer details are added.\n\nThe price is 4000.\n\nDiscounted Price is 400.0.\n\nPlease Pay. 3600.0";
         expectedResponse = "Failed to add customer details.";
@@ -149,7 +166,10 @@ class CustomerControllerTest {
         quantity = order.getQuantity();
         customer.setOrderDetails(order);
 
+        customerService.setEnabledMethod(false);
         ResponseEntity<Object> responseEntity2 = customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
+
         String actualResponse2 = (String) responseEntity2.getBody();
         String expectedResponse2 = "The product is out of stock for now.\nWe'll notify you once the product is restocked";
         Assertions.assertEquals(expectedResponse2, actualResponse2);
@@ -160,7 +180,11 @@ class CustomerControllerTest {
         quantity = order.getQuantity();
         customer.setOrderDetails(order);
         long expectedPrice = productPrice * quantity;
+
+        customerService.setEnabledMethod(false);
         ResponseEntity<Object> responseEntity3 = customerController.addCustomer(customer);
+        customerService.setEnabledMethod(true);
+
         Assertions.assertFalse(responseEntity3.getBody().toString().contains(String.valueOf(expectedPrice)));
     }
 
